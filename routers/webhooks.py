@@ -46,7 +46,7 @@ async def process_webhook(name: str, body: WebhookPayload, db: any = Depends(get
   webhook = await get_webhook(db, name)
   if webhook:
       room_id, template = (webhook.roomId, webhook.template)
-      send_message_to_room(room_id, body, template)
+      send_message_to_room(room_id, dict(body.payload), template)
       return {"message": "webhook processed successfully!"}
   else:
       return {"message": "can't process webhook"}

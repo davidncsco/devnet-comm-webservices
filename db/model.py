@@ -9,5 +9,6 @@ class Webhook(BaseModel):
     
     
 class WebhookPayload(BaseModel):
-  event_type: str
-  data: dict
+  payload: dict
+  id: str
+  source: dict

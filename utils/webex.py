@@ -77,12 +77,11 @@ def truncate_string(long_string, max_lines=3):
         return "\n".join(lines[:max_lines]) + "..."
 
 
-def send_message_to_room(room_id, body, template): 
+def send_message_to_room(room_id, payload, template): 
     # Prepare JSON data for the message
     # Message content (supports plain text, markdown, or HTML)
     print(f"Sending msg to room: {room_id} with template={template}")
-    payload = dict(body.data).get('payload',{})
-    if not payload:
+    if not payload: # If payload is empty
         return
     filled_template = TEMPLATES[template-1].format(
         activityType=payload['activityType'],
