@@ -1,4 +1,5 @@
 import requests, json
+from db.model import WebhookPayload
 
 # Bot's access token
 access_token = "Y2NjNjU1ODItNDAzYi00ZDBmLWEyNzQtMDFmNjExMGRlNjJjODE0ZGE2NjAtNWI3_PF84_1eb65fdf-9643-417f-9974-ad72cae0e10f"
@@ -11,8 +12,6 @@ headers = {
     "Authorization": f"Bearer {access_token}",
     "Content-Type": "application/json",
 }
-
-DEBUG = False
 
 TEMPLATES = [
     """
@@ -78,11 +77,13 @@ def truncate_string(long_string, max_lines=3):
         return "\n".join(lines[:max_lines]) + "..."
 
 
-def send_message_to_room(room_id, payload, template): 
+def send_message_to_room(room_id, body, template): 
     # Prepare JSON data for the message
     # Message content (supports plain text, markdown, or HTML)
     print(f"Sending msg to room: {room_id} with template={template}")
-    #print(f"Payload={payload}")
+    payload = dict(body.data).get('payload',{})
+    if not payload:
+        return
     filled_template = TEMPLATES[template-1].format(
         activityType=payload['activityType'],
         member=payload['member']['fullName'],
@@ -94,9 +95,6 @@ def send_message_to_room(room_id, payload, template):
         datetime=convert_to_localtime(payload['timestamp']),
         summary=truncate_string(payload.get('content', ''), 6)
     )
-    if DEBUG:
-        print(filled_template)
-        return
 
     data = {"roomId": room_id, "html": filled_template}
     response = requests.post(url, headers=headers, json=data)

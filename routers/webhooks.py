@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException 
 from db.database import get_database
 from db.model import Webhook, WebhookPayload
-
 from utils.crud import (
     fetch_all_webhooks,
     add_webhook,
@@ -40,16 +39,14 @@ async def modify_webhook(name: str, webhook: Webhook, db: any = Depends(get_data
 async def remove_webhook(name: str, db: any = Depends(get_database)):
     return await delete_webhook(db, name)
 
-templates = [
-    "{}"
-]
-# Processing webhooks
+
 @webhooks.post("/name={name}")
-async def process_webhook(name: str, payload: WebhookPayload, db: any = Depends(get_database)):
+async def process_webhook(name: str, body: WebhookPayload, db: any = Depends(get_database)):
   print(f"Webhook name = {name}")
-  webhook = await get_webhook(db, name) 
+  webhook = await get_webhook(db, name)
   if webhook:
-      send_message_to_room(webhook.roomId, payload.data, webhook.template)
+      room_id, template = (webhook.roomId, webhook.template)
+      send_message_to_room(room_id, body, template)
       return {"message": "webhook processed successfully!"}
   else:
       return {"message": "can't process webhook"}
