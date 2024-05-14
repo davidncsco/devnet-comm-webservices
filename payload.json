@@ -1,0 +1,99 @@
+### Activity Payload ###
+{
+  "payload": {
+    "type": "activity",
+    "version": "202401",
+    "member": {
+      "primaryEmail": "marionsanford@domain1.com",
+      "organization": {
+        "name": "TechWrite Solutions",
+        "domain": "techwritesolutions.com",
+        "location": { "city": "Austin", "region": "Texas", "country": "USA" }
+      },
+      "fullName": "Marion Sanford",
+      "allEmails": [
+        "marionsanford@domain1.com",
+        "marionsanford@domain2.com",
+        "marionsanford@domain3.com"
+      ],
+      "linkedIn": "in/msanford",
+      "twitter": "msanford",
+      "github": "msanford",
+      "discord": "msanford#1234",
+      "youtube": "msanford",
+      "linkedInUrl": "https://linkedin.com/in/msanford",
+      "twitterUrl": "https://twitter.com/i/user/12345678",
+      "githubUrl": "https://github.com/msanford",
+      "discordUrl": "https://discord.com/users/msanford#12345678",
+      "youtubeUrl": "https://www.youtube.com/channel/msanford"
+    },
+    "activityType": "DiscordThreadCreated",
+    "serviceName": "Discord",
+    "title": "Thread Title",
+    "content": "New Thread Name",
+    "commonRoomActivityUrl": "https://app.commonroom.io/community/123/activity/eyJwcm92aWRlcklkIjoxMjM0LCJ0b2tlbiI6ImRtXzEyMzQ1NjcifQ==",
+    "externalActivityUrl": "https://discord.com/channels/12345/67890/threads/98765",
+    "timestamp": "2023-04-17T10:21:26.978Z",
+    "categories": ["Product Question"],
+    "sentiment": "Positive",
+    "tags": ["Test Tag"],
+    "topics": ["api", "documentation"]
+  },
+  "id": "038132e0-130b-47c2-bea2-5bff2ae1d4cd",
+  "source": { "type": "workflow", "id": 1234, "name": "Test Workflow" }
+}
+### Organization Payload ###
+{
+  "payload": {
+    "type": "organization",
+    "version": "202304",
+    "name": "TechWrite Solutions",
+    "domain": "techwritesolutions.com",
+    "location": { "city": "Austin", "region": "Texas", "country": "USA" },
+    "logoUrl": "https://www.example.com/logo/1d387064a52ba82a.png"
+  },
+  "id": "59c9bc0c-00bb-481a-b90f-f47957a63fe8",
+  "source": { "type": "workflow", "id": 1234, "name": "Test Workflow" }
+}
+### Contact Payload ###
+{
+  "payload": {
+    "primaryEmail": "marionsanford@domain1.com",
+    "organization": {
+      "name": "TechWrite Solutions",
+      "domain": "techwritesolutions.com",
+      "location": { "city": "Austin", "region": "Texas", "country": "USA" }
+    },
+    "fullName": "Marion Sanford",
+    "allEmails": [
+      "marionsanford@domain1.com",
+      "marionsanford@domain2.com",
+      "marionsanford@domain3.com"
+    ],
+    "linkedIn": "in/msanford",
+    "twitter": "msanford",
+    "github": "msanford",
+    "discord": "msanford#1234",
+    "youtube": "msanford",
+    "linkedInUrl": "https://linkedin.com/in/msanford",
+    "twitterUrl": "https://twitter.com/i/user/12345678",
+    "githubUrl": "https://github.com/msanford",
+    "discordUrl": "https://discord.com/users/msanford#12345678",
+    "youtubeUrl": "https://www.youtube.com/channel/msanford",
+    "type": "member",
+    "version": "202304",
+    "avatarUrl": "https://www.example.com/avatar/1d387064a52ba82a.png",
+    "segments": [{ "id": 72602171, "name": "Test Segment" }],
+    "tags": [{ "id": 70790368, "name": "Test Tag" }],
+    "title": "Technical Writer",
+    "role": "Technical Communications",
+    "firstSeenDate": "2002-11-19T06:45:59.888Z",
+    "firstSeenSource": "YouTube",
+    "lastSeenDate": "2022-12-05T00:27:54.679Z",
+    "lastSeenSource": "LinkedIn"
+  },
+  "id": "d84ba76f-3d14-4a0e-8d33-8ccac59d9d8d",
+  "source": { "type": "workflow", "id": 1234, "name": "Test Workflow" }
+}
+===============
+{"payload":{"tags":[],"type":"activity","title":"Added modules for multi cluster configuration","member":{"github":"anvitha-jain","fullName":"Anvitha Jain","linkedIn":"in/anvitha-jain","allEmails":["anvithjain@gmail.com","anvjain@cisco.com"],"githubUrl":"https://github.com/anvitha-jain","linkedInUrl":"https://linkedin.com/in/anvitha-jain","organization":{"name":"Cisco","domain":"cisco.com","location":{"city":"Milpitas","region":"California","country":"United States"}},"primaryEmail":"anvjain@cisco.com"},"topics":[],"version":"202401","timestamp":"2024-05-13T21:03:36.000Z","categories":[],"serviceName":"GitHub","activityType":"GitHubPullRequestSubmission","externalActivityUrl":"https://github.com/CiscoDevNet/ansible-nd/pull/74","commonRoomActivityUrl":"https://app.commonroom.io/community/5302/activity/eyJwcm92aWRlcklkIjozNDgyMywidG9rZW4iOiJncHJfUFJfa3dET0U4RkxQODV2VUhxUyJ9"},"id":"5302-27565-34823-gpr_PR_kwDOE8FLP85vUHqS","source":{"type":"workflow","id":27565,"name":"Workflow to test new webhook server"}}
