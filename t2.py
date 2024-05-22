@@ -1,5 +1,10 @@
-import random,json
+import random,json,os
 import requests
+import asyncio
+
+from db.model import WebexMessageTemplate
+from db.database import get_database
+from db.crud import fetch_all_templates
 from utils.webex import send_message_to_room
 
 def get_random_star_wars_character():
@@ -57,8 +62,8 @@ def convert_to_localtime2(utc_str):
     local_datetime = utc_datetime.replace(tzinfo=timezone.utc).astimezone()
 
     return local_datetime.strftime('%m/%d/%Y %H:%M')
-
-
+    
+    
 if __name__ == "__main__":
     room_id = "Y2lzY29zcGFyazovL3VzL1JPT00vMTYzMDc4OTAtZTZmNy0xMWVlLTgxYzgtNGRhY2Q3ZTM4Yjdj"
     with open('sample.json') as sample:
@@ -67,7 +72,8 @@ if __name__ == "__main__":
     # summary=payload.get('content', '')
     # truncated_summary = truncate_string(summary,6)
     # print(f"Summary:{truncated_summary}")
-    send_message_to_room(room_id,payload,1)
+    templates = fetch_all_templates()
+    #send_message_to_room(room_id,payload,templates[0])
     
     # local_time = convert_to_localtime2("2024-05-13T23:48:53.172Z")
     # print(local_time)

@@ -8,4 +8,3 @@ db = client.webservices
 
 async def get_database():
     yield db
-

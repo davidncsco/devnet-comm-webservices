@@ -1,17 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException 
+from fastapi import APIRouter, Depends 
 from db.database import get_database
 from db.model import Webhook, WebhookPayload
-from utils.crud import (
+from utils.webex import send_message_to_room
+from db.crud import (
     fetch_all_webhooks,
     add_webhook,
     get_webhook,
     update_webhook,
-    delete_webhook
+    delete_webhook,
+    get_template
 )
 
-from utils.webex import (
-  send_message_to_room
-)
 
 webhooks = APIRouter(prefix="/webhooks", tags=["Webhooks"])
 
@@ -32,7 +31,7 @@ async def read_webhook(name: str, db: any = Depends(get_database)):
 
 @webhooks.put("/{name}")
 async def modify_webhook(name: str, webhook: Webhook, db: any = Depends(get_database)):
-    return await update_webhook(db, name, webhook)
+    return await update_webhook(db, name, webhook.template)
 
 
 @webhooks.delete("/{name}")
@@ -43,10 +42,10 @@ async def remove_webhook(name: str, db: any = Depends(get_database)):
 @webhooks.post("/process/{name}")
 async def process_webhook(name: str, body: WebhookPayload, db: any = Depends(get_database)):
   print(f"Webhook name = {name}")
-  webhook = await get_webhook(db, name)
-  if webhook:
-      room_id, template = (webhook.roomId, webhook.template)
-      send_message_to_room(room_id, dict(body.payload), template)
+  webhook: Webhook = await get_webhook(db, name)
+  msg_template = await get_template(db,webhook.template)
+  if msg_template:
+      send_message_to_room(webhook.roomId, dict(body.payload), msg_template)
       return {"message": "webhook processed successfully!"}
   else:
       return {"message": "can't process webhook"}

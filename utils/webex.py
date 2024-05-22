@@ -1,8 +1,9 @@
-import requests, json
-from db.model import WebhookPayload
+import requests, os
+from db.model import WebexMessageTemplate
+from typing import List
 
 # Bot's access token
-access_token = "Y2NjNjU1ODItNDAzYi00ZDBmLWEyNzQtMDFmNjExMGRlNjJjODE0ZGE2NjAtNWI3_PF84_1eb65fdf-9643-417f-9974-ad72cae0e10f"
+access_token = os.getenv("BOT_ACCESS_TOKEN", None)
 
 # Build the request URL
 url = "https://webexapis.com/v1/messages"
@@ -12,42 +13,7 @@ headers = {
     "Authorization": f"Bearer {access_token}",
     "Content-Type": "application/json",
 }
-
-TEMPLATES = [
-    """
-    <hr>
-    <h2>{activityType}</h2><br>
-    <br>
-    <b>Title:</b> {title}<br>
-    <b>Member:</b> {member}<br>
-    <b>Email:</b> {emails}<br>
-    <b>Platform:</b> {platform}<br>
-    <b>Date/time:</b> {datetime}<br>
-    <b>Topics:</b> {topics}<br>
-    <b>Link:</b> {link}<br>
-    <b>Summary:</b> {summary}
-    """,
-    
-    """
-    <hr>
-    <h2>{activityType}</h2><br>
-    <br>   
-    <b>Member:</b> {member}<br>
-    <b>Platform:</b> {platform}<br>
-    <b>Date/time:</b> {datetime}<br>
-    <b>Topics:</b> {topics}<br>
-    <b>Link:</b> {link}
-    """,
-    
-    """
-    <h2>{activityType}</h2><br>
-    <br>
-    <b>Member:</b> {member}<br>
-    <b>Topics:</b> {topics}<br>
-    <b>Link:</b> {link}
-    """
-]
-
+ 
 def convert_to_localtime(utc_str):
     from datetime import datetime, timezone
 
@@ -75,15 +41,10 @@ def truncate_string(long_string, max_lines=3):
         return long_string
     else:
         return "\n".join(lines[:max_lines]) + "..."
-
-
-def send_message_to_room(room_id, payload, template): 
-    # Prepare JSON data for the message
-    # Message content (supports plain text, markdown, or HTML)
-    print(f"Sending msg to room: {room_id} with template={template}")
-    if not payload: # If payload is empty
-        return
-    filled_template = TEMPLATES[template-1].format(
+    
+def get_filled_template(payload, template: List[str]) -> str:
+    msg_template = '\n'.join(template)
+    return msg_template.format(
         activityType=payload['activityType'],
         member=payload['member']['fullName'],
         platform=payload['serviceName'],
@@ -92,10 +53,18 @@ def send_message_to_room(room_id, payload, template):
         link=payload['externalActivityUrl'],
         emails=', '.join(payload['member']['allEmails']),
         datetime=convert_to_localtime(payload['timestamp']),
-        summary=truncate_string(payload.get('content', ''), 6)
+        summary=truncate_string(payload.get('content', ''), 4)
     )
-
+    
+def send_message_to_room(room_id, payload, template: WebexMessageTemplate): 
+    # Prepare JSON data for the message
+    # Message content (supports plain text, markdown, or HTML)
+    if not payload: # If payload is empty
+        return
+        
+    filled_template = get_filled_template(payload,template.template)
     data = {"roomId": room_id, "html": filled_template}
+    #print(f"send_message_to_room, data={data}")
     response = requests.post(url, headers=headers, json=data)
 
     # Check for successful response
