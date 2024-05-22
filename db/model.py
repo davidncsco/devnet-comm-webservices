@@ -9,11 +9,16 @@ class Webhook(BaseModel):
     template: int | None = 1
     
 class WebhookPayload(BaseModel):
-  payload: dict
-  id: str
-  source: dict
+    payload: dict
+    id: str
+    source: dict
 
 class WebexMessageTemplate(BaseModel):
-  id: int
-  name: str
-  template: List[str]
+    id: int
+    name: str
+    template: List[str]
+  
+class WebhookDevNetNewRegistration(BaseModel):
+    user_id: str
+    registration_time: str
+    refer_url: str

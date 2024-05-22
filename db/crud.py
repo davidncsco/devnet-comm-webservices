@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from db.model import Webhook, WebexMessageTemplate
+from db.model import Webhook, WebexMessageTemplate, WebhookDevNetNewRegistration
 from typing import List
 
 async def fetch_all_webhooks(db) -> list:

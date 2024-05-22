@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends 
 from db.database import get_database
-from db.model import Webhook, WebhookPayload
+from db.model import Webhook, WebhookPayload, WebhookDevNetNewRegistration
 from utils.webex import send_message_to_room
 from db.crud import (
     fetch_all_webhooks,
@@ -49,3 +49,11 @@ async def process_webhook(name: str, body: WebhookPayload, db: any = Depends(get
       return {"message": "webhook processed successfully!"}
   else:
       return {"message": "can't process webhook"}
+  
+@webhooks.post("/registration")
+async def process_devnet_new_registration(new_user: WebhookDevNetNewRegistration):
+    print("Receive new DevNet user registration")
+    print(f"user_id={new_user.user_id}")
+    print(f"registration time={new_user.registration_time}")
+    print(f"refer url={new_user.refer_url}")
+    return {"Message":"new registration processed successfully"}

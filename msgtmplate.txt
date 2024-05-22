@@ -1,0 +1,66 @@
+    "<hr>",
+    "<h2>{activityType}</h2><br>",
+    "<br>",
+    "<b>Title:</b> {title}<br>",
+    "<b>Member:</b> {member}<br>",
+    "<b>Email:</b> {emails}<br>",
+    "<b>Platform:</b> {platform}<br>",
+    "<b>Date/time:</b> {datetime}<br>",
+    "<b>Topics:</b> {topics}<br>",
+    "<b>Link:</b> {link}<br>",
+    "<b>Summary:</b> {summary}"
+    """,
+    
+    """
+    "<hr>",
+    "<h2>{activityType}</h2><br>",
+    "<br>",
+    "<b>Member:</b> {member}<br>",
+    "<b>Platform:</b> {platform}<br>",
+    "<b>Date/time:</b> {datetime}<br>",
+    "<b>Topics:</b> {topics}<br>",
+    "<b>Link:</b> {link}"
+    """,
+    
+    """
+    "<hr>",
+    "<h2>{activityType}</h2><br>",
+    "<br>",
+    "<b>Member:</b> {member}<br>",
+    "<b>Topics:</b> {topics}<br>",
+    "<b>Link:</b> {link}"
+    """
+
+       """
+    <hr>
+    <h2>{activityType}</h2><br>
+    <br>
+    <b>Title:</b> {title}<br>
+    <b>Member:</b> {member}<br>
+    <b>Email:</b> {emails}<br>
+    <b>Platform:</b> {platform}<br>
+    <b>Date/time:</b> {datetime}<br>
+    <b>Topics:</b> {topics}<br>
+    <b>Link:</b> {link}<br>
+    <b>Summary:</b> {summary}
+    """,
+    
+    """
+    <hr>
+    <h2>{activityType}</h2><br>
+    <br>   
+    <b>Member:</b> {member}<br>
+    <b>Platform:</b> {platform}<br>
+    <b>Date/time:</b> {datetime}<br>
+    <b>Topics:</b> {topics}<br>
+    <b>Link:</b> {link}
+    """,
+    
+    """
+    <hr>
+    <h2>{activityType}</h2><br>
+    <br>
+    <b>Member:</b> {member}<br>
+    <b>Topics:</b> {topics}<br>
+    <b>Link:</b> {link}
+    """
