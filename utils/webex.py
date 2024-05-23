@@ -25,7 +25,7 @@ def convert_to_localtime(utc_str):
     return local_datetime.strftime('%m/%d/%Y %H:%M')
     
 
-def truncate_string(long_string, max_lines=3):
+def truncate_string(long_string, max_lines=2):
     """
     Truncates a long string to a maximum of two lines and adds "...".
 
@@ -53,7 +53,7 @@ def get_filled_template(payload, template: List[str]) -> str:
         link=payload['externalActivityUrl'],
         emails=', '.join(payload['member']['allEmails']),
         datetime=convert_to_localtime(payload['timestamp']),
-        summary=truncate_string(payload.get('content', ''), 4)
+        summary=truncate_string(payload.get('content', ''), 3)
     )
     
 def send_message_to_room(room_id, payload, template: WebexMessageTemplate): 
