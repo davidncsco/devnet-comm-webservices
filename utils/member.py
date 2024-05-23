@@ -17,9 +17,9 @@ SERVICE_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXNvdXJjZSI6ImZvdW5kYX
 def process_new_registration(payload: dict):
     user = {}
     #print(f'payload={payload}')
-    email =  payload['primaryEmail']
-    if email:
+    if 'primaryEmail' in payload:
+        email =  payload['primaryEmail']
         print(f"process new registration for user {email}")
-        if( len(payload['allEmails']) > 1 ):
+        if ('allEmails' in payload) and (len(payload['allEmails']) > 1):
             allEmails = ','.join(payload['allEmails'])
             print(f"all emails = {allEmails}")
