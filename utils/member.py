@@ -20,6 +20,6 @@ def process_new_registration(payload: dict):
     email =  payload['primaryEmail']
     if email:
         print(f"process new registration for user {email}")
-        if( len(payload['allEmails']) > 0 ):
+        if( len(payload['allEmails']) > 1 ):
             allEmails = ','.join(payload['allEmails'])
             print(f"all emails = {allEmails}")
