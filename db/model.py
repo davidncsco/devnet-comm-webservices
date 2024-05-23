@@ -19,6 +19,12 @@ class WebexMessageTemplate(BaseModel):
     template: List[str]
   
 class WebhookDevNetNewRegistration(BaseModel):
-    user_id: str
+    profile_id: str
     registration_time: str
     refer_url: str
+
+class Member(BaseModel):
+    email: str
+    profile_id: str
+    
+    
