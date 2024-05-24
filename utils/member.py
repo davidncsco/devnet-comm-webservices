@@ -4,6 +4,9 @@ from db.model import Member
 
 client_id = os.getenv("DEVNET_SERVICE_CLIENT_ID")
 client_secret = os.getenv("DEVNET_SERVICE_CLIENT_SECRET")
+# To add devnet account tag to CR member
+common_room_bearer_token = os.getenv("COMMON_ROOM_BEARER_TOKEN")
+devnet_account_tag = "DevNet account"
 
 def get_devnet_service_token() -> str:
     """
@@ -29,7 +32,7 @@ def get_devnet_service_token() -> str:
         return None
 
 MAX_RETRIES = 2
-devnet_service_token = ""
+devnet_service_token = None
 
 def user_is_registered_on_devnet(email: str) -> str:
     """
@@ -68,9 +71,31 @@ def user_is_registered_on_devnet(email: str) -> str:
         
     return None
 
+def add_member_tag(email,tag_name):
+    """
+    Adds "DevNet account" tag to a CR Community Member
+    """
+    url = "https://api.commonroom.io/community/v1/members/tags"
+    headers = {
+        "Authorization": f"Bearer {common_room_bearer_token}",
+        "Content-Type": "application/json"
+    }
+    body = {
+        "socialType": "email",
+         "value": f"{email}",
+        "tags": f"{tag_name}"
+    }
+    response = requests.post(url, headers=headers,json=body)
+    # Check for successful response
+    if response.status_code == 200:
+        print(f"{devnet_account_tag} tag added to member with email={email}")
+    else:
+        print(f"Error adding member tag: {response.status_code} - {response.text}")
+
+
 def process_new_registration(payload: dict):
     """
-    Process new CR user who joins the space/source. This results in a Webhook trigger sent to our server
+    Process new CR user who joins the space/source. This event results in a Webhook trigger sent to our server
     """
     #print(f'payload={payload}')
     if 'primaryEmail' in payload:
@@ -81,7 +106,8 @@ def process_new_registration(payload: dict):
             print(f"all emails = {allEmails}")
         id = user_is_registered_on_devnet(email)
         if id:
-            print(f"User has profile on DevNet with id={id}")
+            print(f"User with email {email} has profile on DevNet with id={id}")
+            add_member_tag(email,devnet_account_tag)
         else:
             print(f"User has NO profile on DevNet")
 
