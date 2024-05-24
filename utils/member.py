@@ -29,7 +29,7 @@ def get_devnet_service_token() -> str:
         return None
 
 MAX_RETRIES = 2
-devnet_service_token = None
+devnet_service_token = ""
 
 def user_is_registered_on_devnet(email: str) -> str:
     """
@@ -39,7 +39,7 @@ def user_is_registered_on_devnet(email: str) -> str:
     
     url = f"https://devnet.cisco.com/v1/upm/profiles?email={email}"
     retries = 0
-    if devnet_service_token is None:
+    if not devnet_service_token:
         devnet_service_token = get_devnet_service_token()
         
     # Service token is short lived so need to get it again once it became invalid
