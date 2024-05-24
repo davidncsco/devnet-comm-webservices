@@ -39,12 +39,11 @@ def user_is_registered_on_devnet(email: str) -> str:
     
     url = f"https://devnet.cisco.com/v1/upm/profiles?email={email}"
     retries = 0
-
+    if devnet_service_token is None:
+        devnet_service_token = get_devnet_service_token()
+        
     # Service token is short lived so need to get it again once it became invalid
     while retries < MAX_RETRIES:
-        retries += 1    # Retry if token is no longer valid
-        if devnet_service_token is None:
-            devnet_service_token = get_devnet_service_token()
         headers = {
             "Authorization": f"Bearer {devnet_service_token}"
         }
@@ -60,6 +59,7 @@ def user_is_registered_on_devnet(email: str) -> str:
                     return None
         elif response.status_code == 401:   # token is invalid, retry
             print("Token no longer valid, retry with new token")
+            retries += 1
             devnet_service_token = get_devnet_service_token()
             continue
         else:
