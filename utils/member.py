@@ -1,21 +1,77 @@
-import requests, os
+import requests, base64, os
+from requests.auth import HTTPBasicAuth
 from db.model import Member
 
-CLIENT_ID = "devnet-community-auth"
-CLIENT_SECRET = "Cisc0Psdt123!"
-# To obtain service token for DevNet profile inquiry, send this request
-# POST /v1/auth/services/token
-# Authorization: Basic {base64 encoded value of service_id:service_secret}
- 
-# {
-#   "grant_type":"client_credential",
-#   "resource":"target_service_id"
-# }
-SERVICE_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXNvdXJjZSI6ImZvdW5kYXRpb24tdXBtIiwicGVybXMiOlt7InNlcnZpY2VfYXVkIjoiZm91bmRhdGlvbi11cG0iLCJzZXJ2aWNlX3N1YiI6ImRldm5ldC1jb21tdW5pdHktYXV0aCJ9XSwiYXVkIjoiZm91bmRhdGlvbi11cG0iLCJleHAiOjE3MTY0ODIwNTcsImp0aSI6ImVhZTIzMmVhLTE5MTktMTFlZi1iNGQ5LWVhMTE4NDgyODY4MCIsImlhdCI6MTcxNjQ3ODQ1NywiaXNzIjoiaW50ZXJuYWwiLCJzdWIiOiJkZXZuZXQtY29tbXVuaXR5LWF1dGgifQ.tDYQnXnxXqgDvnVojaiOh6zFWmt82mI6Lo_VJwVychlllhBVMWE3j5xPdUnaX4khohuouGnfb8ZYqRJbE0Sls467x0Lewnz2hIFKXUYPsohEi1xWFpVr79345mGBnXfVe0AsGaaOBcf_sbKhNPPNEt5tDbtAAd6noKDr2jOwAAc"
+client_id = os.getenv("DEVNET_SERVICE_CLIENT_ID")
+client_secret = os.getenv("DEVNET_SERVICE_CLIENT_SECRET")
 
+def get_devnet_service_token() -> str:
+    """
+    Get service token from auth
+    """
+    
+    url = "https://auth-devnet.cisco.com/v1/auth/services/token"
+    body = {
+        "grant_type":"client_credential",
+        "resource":"foundation-upm"
+    }
+    response = requests.post(url, auth=(client_id,client_secret),json=body)
+    # Check for successful response
+    if response.status_code == 200:
+        data = response.json()
+        if 'token' in data:
+            #print(f'generated token: {data['token']}')
+            return data['token']
+        else:
+            return None
+    else:
+        print(f"Error sending message: {response.status_code} - {response.text}")
+        return None
+
+MAX_RETRIES = 2
+devnet_service_token = None
+
+def user_is_registered_on_devnet(email: str) -> str:
+    """
+    Check if user profile is on DevNet, return user id or None
+    """
+    global devnet_service_token
+    
+    url = f"https://devnet.cisco.com/v1/upm/profiles?email={email}"
+    retries = 0
+
+    # Service token is short lived so need to get it again once it became invalid
+    while retries < MAX_RETRIES:
+        retries += 1    # Retry if token is no longer valid
+        if devnet_service_token is None:
+            devnet_service_token = get_devnet_service_token()
+        headers = {
+            "Authorization": f"Bearer {devnet_service_token}"
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+            if email in data:
+                provider_ids = data.get(email)
+                if provider_ids:
+                    first_key = next(iter(provider_ids.keys()))
+                    return provider_ids[first_key]
+                else:
+                    return None
+        elif response.status_code == 401:   # token is invalid, retry
+            print("Token no longer valid, retry with new token")
+            devnet_service_token = get_devnet_service_token()
+            continue
+        else:
+            print(f"Error fetching user profile from DevNet: {response.status_code} - {response.text}")
+            return None
+        
+    return None
 
 def process_new_registration(payload: dict):
-    user = {}
+    """
+    Process new CR user who joins the space/source. This results in a Webhook trigger sent to our server
+    """
     #print(f'payload={payload}')
     if 'primaryEmail' in payload:
         email =  payload['primaryEmail']
@@ -23,3 +79,11 @@ def process_new_registration(payload: dict):
         if ('allEmails' in payload) and (len(payload['allEmails']) > 1):
             allEmails = ','.join(payload['allEmails'])
             print(f"all emails = {allEmails}")
+        id = user_is_registered_on_devnet(email)
+        if id:
+            print(f"User has profile on DevNet with id={id}")
+        else:
+            print(f"User has NO profile on DevNet")
+
+
+        
