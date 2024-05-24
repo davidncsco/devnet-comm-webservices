@@ -16,6 +16,7 @@ class WebhookPayload(BaseModel):
 class WebexMessageTemplate(BaseModel):
     id: int
     name: str
+    type: str
     template: List[str]
   
 class WebhookDevNetNewRegistration(BaseModel):
@@ -26,5 +27,3 @@ class WebhookDevNetNewRegistration(BaseModel):
 class Member(BaseModel):
     email: str
     profile_id: str
-    
-    

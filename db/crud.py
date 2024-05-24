@@ -48,6 +48,8 @@ async def fetch_all_templates(db) -> list:
     return templates
 
 async def add_template(db, template: WebexMessageTemplate) -> WebexMessageTemplate:
+    global templates
+    
     await db.templates.insert_one(dict(template))
     templates.append(WebexMessageTemplate(**template))
     return template
