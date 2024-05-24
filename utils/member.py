@@ -20,7 +20,7 @@ def get_devnet_service_token() -> str:
     if response.status_code == 200:
         data = response.json()
         if 'token' in data:
-            #print(f'generated token: {data['token']}')
+            print(f'generated new service token: {data['token']}')
             return data['token']
         else:
             return None
