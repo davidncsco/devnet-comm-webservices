@@ -16,14 +16,15 @@ headers = {
  
 def convert_to_localtime(utc_str):
     from datetime import datetime, timezone
-
-    # Parse the UTC datetime string
-    utc_datetime = datetime.strptime(utc_str, '%Y-%m-%dT%H:%M:%S.%fZ')
-    # Convert to local time
-    local_datetime = utc_datetime.replace(tzinfo=timezone.utc).astimezone()
-
-    return local_datetime.strftime('%m/%d/%Y %H:%M')
     
+    if utc_str:
+        # Parse the UTC datetime string
+        utc_datetime = datetime.strptime(utc_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+        # Convert to local time
+        local_datetime = utc_datetime.replace(tzinfo=timezone.utc).astimezone()
+        return local_datetime.strftime('%m/%d/%Y %H:%M')
+    else:
+        return None
 
 def truncate_string(long_string, max_lines=2):
     """
@@ -44,16 +45,19 @@ def truncate_string(long_string, max_lines=2):
     
 def get_filled_template(payload, template: List[str]) -> str:
     msg_template = '\n'.join(template)
+    member_attr = payload.get('member', {})
     return msg_template.format(
-        activityType=payload['activityType'],
-        member=payload['member']['fullName'],
-        platform=payload['serviceName'],
+        activityType=payload.get('activityType',''),
+        member=member_attr.get('fullName',''),        
+        platform=payload.get('serviceName', ''),
         title=payload.get('title', ''),
-        topics=', '.join(payload['topics']),
-        link=payload['externalActivityUrl'],
-        emails=', '.join(payload['member']['allEmails']),
-        datetime=convert_to_localtime(payload['timestamp']),
-        summary=truncate_string(payload.get('content', ''), 3)
+        topics=', '.join(payload.get('topics', [])),
+        link=payload.get('externalActivityUrl', ''),
+        emails=', '.join(member_attr.get('allEmails', [])),
+        datetime=convert_to_localtime(payload.get('timestamp', '')),
+        summary=truncate_string(payload.get('content', ''), 3),
+        email=payload.get('email',''),
+        provider_id=payload.get('provider_id','')
     )
     
 def send_message_to_room(room_id, payload, template: WebexMessageTemplate): 

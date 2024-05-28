@@ -54,7 +54,7 @@ async def process_webhook(name: str, body: WebhookPayload, db: any = Depends(get
         else:
             return {"message": "can't process webhook"}
     elif payload['type'] == "member":
-        process_new_registration(payload)
+        await process_new_registration(payload)
         return {"message": f"received member payload for {payload['fullName']}"}
     elif payload['type'] == "organization":
         return {"message": f"received organization payload for {payload['name']}"}

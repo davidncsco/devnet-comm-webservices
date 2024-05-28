@@ -1,6 +1,7 @@
-import requests, base64, os
-from requests.auth import HTTPBasicAuth
-from db.model import Member
+import requests, os
+from utils.webex import send_message_to_room
+from db.crud import DataAccess
+from typing import List
 
 client_id = os.getenv("DEVNET_SERVICE_CLIENT_ID")
 client_secret = os.getenv("DEVNET_SERVICE_CLIENT_SECRET")
@@ -42,7 +43,8 @@ def user_is_registered_on_devnet(email: str) -> str:
     
     url = f"https://devnet.cisco.com/v1/upm/profiles?email={email}"
     retries = 0
-    if not devnet_service_token:
+    if devnet_service_token is None:
+        print("Getting devnet service token on the first run")
         devnet_service_token = get_devnet_service_token()
         
     # Service token is short lived so need to get it again once it became invalid
@@ -91,9 +93,24 @@ def add_member_tag(email,tag_name):
         print(f"{devnet_account_tag} tag added to member with email={email}")
     else:
         print(f"Error adding member tag: {response.status_code} - {response.text}")
+    
+# Data dependency injection for DataAccess    
+data_access = None
 
+async def log_message_to_room(email, id):
+    global data_access
+    
+    name = "biggs_darklighter"
+    print(f"log_message_to_room: webhook name = {name}")
+    if data_access is None:
+        data_access = DataAccess()
+    webhook = await data_access.get_webhook_by_name(name)
+    if webhook:
+        template = await data_access.get_template_by_id(webhook.template)
+        if template:
+            send_message_to_room(webhook.roomId, {'email': email, 'provider_id': id}, template)
 
-def process_new_registration(payload: dict):
+async def process_new_registration(payload: dict):
     """
     Process new CR user who joins the space/source. This event results in a Webhook trigger sent to our server
     """
@@ -108,6 +125,7 @@ def process_new_registration(payload: dict):
         if id:
             print(f"User with email {email} has profile on DevNet with id={id}")
             add_member_tag(email,devnet_account_tag)
+            await log_message_to_room(email,id)
         else:
             print(f"User has NO profile on DevNet")
 

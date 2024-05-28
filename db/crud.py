@@ -1,11 +1,47 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
+from motor.motor_asyncio import AsyncIOMotorClient
 from db.model import Webhook, WebexMessageTemplate, WebhookDevNetNewRegistration
 from typing import List
+import os
 
+db_connect_uri = os.getenv("DB_CONNECTION","mongodb://davidn:cisco@127.0.0.1:27017/")
+db_name = 'webservices'
+
+class DataAccess:
+    def __init__(self):
+        self.client = AsyncIOMotorClient(db_connect_uri)
+        self.db = self.client[db_name]
+        self.webhooks: List[Webhook] = []
+        self.templates: List[WebexMessageTemplate] = []
+
+    async def get_all_webhooks(self) -> List[Webhook]:
+        if len(self.webhooks) == 0:
+            self.webhooks = await fetch_all_webhooks(self.db)
+
+        return self.webhooks
+    
+    async def get_all_templates(self) -> List[WebexMessageTemplate]:
+        if len(self.templates) == 0:
+            self.templates = await fetch_all_templates(self.db)
+        return self.templates
+    
+    async def get_webhook_by_name(self, name) -> Webhook:
+        await self.get_all_webhooks()
+        for webhook in self.webhooks:
+            if webhook.name == name.lower():
+                return webhook
+        return None
+    
+    async def get_template_by_id(self, id):
+        await self.get_all_templates()
+        for template in self.templates:
+            if template.id == id:
+                return template
+        return None
+        
 async def fetch_all_webhooks(db) -> list:
     webhooks = []
-    cursor = db.webhooks.find({})
-    async for webhook in cursor:
+    async for webhook in db.webhooks.find({}):
         webhooks.append(Webhook(**webhook))
     return webhooks
 
@@ -36,15 +72,10 @@ async def delete_webhook(db, name: str) -> dict:
     webhook = await db.webhooks.delete_one({"name": name})
     return {"message":"webhook deleted"}
 
-##### Webex message Template CRUD #####
-templates: List[WebexMessageTemplate] = []
-
-async def fetch_all_templates(db) -> list:
-    global templates
-    
-    if len(templates) == 0:
-        async for template in db.templates.find({}):
-            templates.append(WebexMessageTemplate(**template))
+async def fetch_all_templates(db) -> List[WebexMessageTemplate]:
+    templates = []
+    async for template in db.templates.find({}):
+        templates.append(WebexMessageTemplate(**template))
     return templates
 
 async def add_template(db, template: WebexMessageTemplate) -> WebexMessageTemplate:
@@ -55,13 +86,11 @@ async def add_template(db, template: WebexMessageTemplate) -> WebexMessageTempla
     return template
 
 async def get_template(db, id: int) -> WebexMessageTemplate:
-    global templates
-    
-    if len(templates) == 0:
-        templates = await fetch_all_templates(db)
-    if( id > len(templates)):   # default is the first template
-        return templates[0]
-    return  templates[id-1]
+    template = await db.templates.find_one({"id": id})
+    if not template:
+        raise HTTPException(status_code=404, detail="template "+str(id)+" not found")
+        return None
+    return WebexMessageTemplate(**template)
 
 async def update_template(db, id: int, update_template: WebexMessageTemplate) -> WebexMessageTemplate:
     global templates
