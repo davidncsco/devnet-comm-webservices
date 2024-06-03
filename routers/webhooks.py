@@ -54,7 +54,7 @@ async def process_webhook(name: str, body: WebhookPayload, db: any = Depends(get
         else:
             return {"message": "can't process webhook"}
     elif payload['type'] == "member":
-        await process_new_registration(payload)
+        await process_new_registration(source='cr', payload=payload)
         return {"message": f"received member payload for {payload['fullName']}"}
     elif payload['type'] == "organization":
         return {"message": f"received organization payload for {payload['name']}"}
@@ -62,9 +62,10 @@ async def process_webhook(name: str, body: WebhookPayload, db: any = Depends(get
         return {"message": f"unknown payload type {payload['type']}"}
     
 @webhooks.post("/registration")
-async def process_devnet_new_registration(new_user: WebhookDevNetNewRegistration):
+async def process_devnet_registration(new_user: WebhookDevNetNewRegistration):
     print("Receive new DevNet user registration")
     print(f"user_id={new_user.profile_id}")
     print(f"registration time={new_user.registration_time}")
     print(f"refer url={new_user.refer_url}")
-    return {"Message":"new registration processed successfully"}
+    await process_new_registration(source='devnet', payload={'id': new_user.profile_id, 'time': new_user.registration_time})
+    return {"Message":"devnet registration processed"}
