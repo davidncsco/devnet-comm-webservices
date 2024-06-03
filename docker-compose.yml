@@ -1,0 +1,27 @@
+version: "3.0"  # Version of the Compose file format
+
+services:
+  # FastAPI application service
+  web:
+    build: .  # Build the image from the current directory (./)
+    ports:
+      - "8000:8000"  # Map container port 8000 to host port 8000
+    environment:
+      - DB_CONNECTION=mongodb
+      - BOT_ACCESS_TOKEN="Y2NjNjU1ODItNDAzYi00ZDBmLWEyNzQtMDFmNjExMGRlNjJjODE0ZGE2NjAtNWI3_PF84_1eb65fdf-9643-417f-9974-ad72cae0e10f"
+    depends_on:
+      - mongodb  # Wait for MongoDB to be ready before starting the app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000  # Specify FastAPI command
+
+  # MongoDB service
+  mongodb:
+    image: mongo:latest  # Use the official MongoDB image
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root  # Set MongoDB root user (optional, for security)
+      - MONGO_INITDB_ROOT_PASSWORD=example  # Set MongoDB root password (optional, for security)
+    volumes:
+      - mongodb-data:/tmp/data/db  # Create a named volume for persistent data
+
+# Define named volume for MongoDB data
+volumes:
+  mongodb-data:

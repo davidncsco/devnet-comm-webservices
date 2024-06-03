@@ -1,0 +1,11 @@
+{
+  "terry.ayers@wwt.net": {}
+}
+
+https://devnet.cisco.com/v1/upm/profiles?email=terry.ayers@wwt.com
+
+{
+  "terry.ayers@wwt.com": {
+    "ciscosso": "f03823f8-3a42-50c0-8e80-869afa6acaf5"
+  }
+}

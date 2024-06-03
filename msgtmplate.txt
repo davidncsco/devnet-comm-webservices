@@ -64,3 +64,17 @@
     <b>Topics:</b> {topics}<br>
     <b>Link:</b> {link}
     """
+
+
+{
+  "id": 4,
+  "name": "New members with DevNet account tag",
+  "type": "member",
+  "template": [
+    "<hr>",
+    "<h2>Member with DevNet account</h2><br>",
+    "<br>",
+    "<b>email:</b> {email}<br>",
+    "<b>id:</b> {provider_id}<br>"
+  ]
+}
