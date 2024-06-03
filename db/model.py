@@ -23,7 +23,3 @@ class WebhookDevNetNewRegistration(BaseModel):
     profile_id: str
     registration_time: str
     refer_url: str
-
-class Member(BaseModel):
-    email: str
-    profile_id: str

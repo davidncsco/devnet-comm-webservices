@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends 
 from db.database import get_database
-from db.model import Webhook, WebhookPayload, WebhookDevNetNewRegistration, Member
+from db.model import Webhook, WebhookPayload, WebhookDevNetNewRegistration
 from utils.webex import send_message_to_room
 from utils.member import process_new_registration
 from db.crud import (
