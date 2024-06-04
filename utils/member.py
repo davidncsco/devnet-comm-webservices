@@ -7,7 +7,8 @@ client_id = os.getenv("DEVNET_SERVICE_CLIENT_ID")
 client_secret = os.getenv("DEVNET_SERVICE_CLIENT_SECRET")
 # To add devnet account tag to CR member
 common_room_bearer_token = os.getenv("COMMON_ROOM_BEARER_TOKEN")
-devnet_account_tag = "DevNet account"
+webex_room_trigger = os.getenv("WEBEX_ROOM_TRIGGER", "biggs_darklighter")
+devnet_account_tag = os.getenv("DEVNET_ACCOUNT_TAG", "DevNet account")
 devnet_service_token = None
 
 class Member:
@@ -167,18 +168,17 @@ def devnet_upm_request(url) -> dict:
 # Data dependency injection for DataAccess    
 data_access = None
 
-async def log_message_to_room(user: Member):
+async def log_message_to_room(user: Member, activityType: str):
     global data_access
     
-    name = "biggs_darklighter"
-    print(f"log_message_to_room: webhook name = {name}")
+    print(f"log_message_to_room: webhook name = {webex_room_trigger}")
     if data_access is None:
         data_access = DataAccess()
-    webhook = await data_access.get_webhook_by_name(name)
+    webhook = await data_access.get_webhook_by_name(webex_room_trigger)
     if webhook:
         template = await data_access.get_template_by_id(webhook.template)
         if template:
-            send_message_to_room(webhook.roomId, {'email': user.email, 'provider_id': user.provider_id}, template)
+            send_message_to_room(webhook.roomId, {'email': user.email, 'provider_id': user.provider_id, 'activityType': activityType}, template)
 
 post_fixes = ["ciscosso", "facebook", "gplus", "commonidentity", "webex", "netacad"]
 
@@ -216,13 +216,13 @@ async def process_new_registration(source: str,payload: dict):
     
     if source == 'cr' and 'primaryEmail' in payload:
         user.email =  payload['primaryEmail']
-        print(f"process new registration for user {user.email}")
+        print(f"process new COMMON ROOM registration for user {user.email}")
         user.provider_id = Member.get_devnet_profile_by_email(user.email)
         if user.provider_id:
             user.devnet_profile = Member.get_devnet_profile_by_id(user.provider_id)
             user.cr_profile = [payload]
             Member.add_member_tag(user.email,devnet_account_tag)
-            await log_message_to_room(user)
+            await log_message_to_room(user, activityType='Common Room member with DevNet account')
             print(user)
     elif source == 'devnet' and payload['id']:
         user.provider_id = payload['id']
@@ -231,5 +231,8 @@ async def process_new_registration(source: str,payload: dict):
         if user.devnet_profile and 'accounts' in user.devnet_profile:
             user.email = extract_email_prefix(user.devnet_profile['accounts'])
             user.cr_profile = Member.get_cr_profile_by_email(user.email)
+            if user.cr_profile:
+                Member.add_member_tag(user.email,devnet_account_tag)
+                await log_message_to_room(user, activityType='New Registration from DevNet')
         print(user)
 
