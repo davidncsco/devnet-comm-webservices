@@ -1,12 +1,12 @@
-FROM python:3.12.2-slim as devnet_webservices
+FROM python:3.12.2-slim as webservices
 
 COPY ./main.py /app/
 COPY ./routers/templates.py ./routers/webhooks.py /app/routers/
 COPY ./db/crud.py ./db/database.py ./db/model.py /app/db/
-COPY ./utils/webex.py /app/utils/
+COPY ./utils/webex.py ./utils/member.py /app/utils/
 COPY ./requirements.txt /app
-ENV DB_CONNECTION="mongodb+srv://david:05ykxtTHVgg5JiMl@cluster0.jnrozjs.mongodb.net/admin"
-ENV BOT_ACCESS_TOKEN="Y2NjNjU1ODItNDAzYi00ZDBmLWEyNzQtMDFmNjExMGRlNjJjODE0ZGE2NjAtNWI3_PF84_1eb65fdf-9643-417f-9974-ad72cae0e10f"
+
+ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends 
+from fastapi import APIRouter, Depends, Request, Response
 from db.database import get_database
 from db.model import WebexMessageTemplate
 
@@ -10,11 +10,17 @@ from db.crud import (
     delete_template
 )
 
-templates = APIRouter(prefix="/template", tags=["Message Template"])
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
+limiter = Limiter(key_func=get_remote_address)
+templates = APIRouter(prefix="/v1/community/templates", tags=["Message Template"])
+templates.limiter = limiter
 
 @templates.get("/")
-async def get_all_template(db: any = Depends(get_database)):
+@limiter.limit("5/second")
+async def get_all_template(request: Request, response: Response, db: any = Depends(get_database)):
     return await fetch_all_templates(db)
 
 

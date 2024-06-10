@@ -4,7 +4,7 @@ from db.model import Webhook, WebexMessageTemplate, WebhookDevNetNewRegistration
 from typing import List
 import os
 
-db_connect_uri = os.getenv("DB_CONNECTION","mongodb://davidn:cisco@127.0.0.1:27017/")
+db_connect_uri = os.getenv("DB_CONNECT_URL","mongodb://davidn:cisco@127.0.0.1:27017/")
 db_name = 'webservices'
 
 class DataAccess:

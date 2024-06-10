@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends 
+from fastapi import APIRouter, Depends, Request, Response
 from db.database import get_database
 from db.model import Webhook, WebhookPayload, WebhookDevNetNewRegistration
 from utils.webex import send_message_to_room
@@ -12,11 +12,17 @@ from db.crud import (
     get_template
 )
 
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
-webhooks = APIRouter(prefix="/webhooks", tags=["Webhooks"])
+limiter = Limiter(key_func=get_remote_address)
+webhooks = APIRouter(prefix="/v1/community/webhooks", tags=["Webhooks"])
+webhooks.limiter = limiter
 
 @webhooks.get("/")
-async def get_all_webhooks(db: any = Depends(get_database)):
+@limiter.limit("5/second")
+async def get_all_webhooks(request: Request, response: Response, db: any = Depends(get_database)):
     return await fetch_all_webhooks(db)
 
 

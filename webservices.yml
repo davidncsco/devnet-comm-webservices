@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    creationTimestamp: null
+    labels:
+        app: devnet-webservices
+        tier: webservices
+    name: devnet-webservices
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: devnet-webservices
+            tier: webservices
+    strategy:
+        rollingUpdate:
+            maxUnavailable: 25%
+    template:
+        metadata:
+            creationTimestamp: null
+            labels:
+                app: devnet-webservices
+                tier: webservices
+        spec:
+            containers:
+                - env:
+                    - name: DB_CONNECT_URL
+                      value: mongodb://davidn:cisco@mongo-svc:27017/
+                    - name: BOT_ACCESS_TOKEN
+                      value: Y2NjNjU1ODItNDAzYi00ZDBmLWEyNzQtMDFmNjExMGRlNjJjODE0ZGE2NjAtNWI3_PF84_1eb65fdf-9643-417f-9974-ad72cae0e10f
+                    - name: DEVNET_SERVICE_CLIENT_ID
+                      value: devnet-community-auth
+                    - name: DEVNET_SERVICE_CLIENT_SECRET
+                      value: Cisc0Psdt123!  
+                    - name: COMMON_ROOM_BEARER_TOKEN
+                      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FwaS5jb21tb25yb29tLmlvL2lzc3Vlci9jcl9tZXRhXzUzMDIiLCJpYXQiOjE3MDgxMjYzNTguMzAzLCJqdGkiOiIwYWM5NGE3YTc5ZjEyMzkxIn0.v5PuyzkGmkqZQTnAT6NqVDSTs28sFuDku4vggjleeVE
+                  image: docker.io/xitrum/webservices:1.0
+                  name: devnet-webservices
+                  ports:
+                    - containerPort: 8000
+                      protocol: TCP
+                  resources: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: devnet-webservices
+spec:
+  selector:
+    app: devnet-webservices
+    tier: webservices
+  ports:
+    - name: webservices
+      port: 8000
+      targetPort: 8000
