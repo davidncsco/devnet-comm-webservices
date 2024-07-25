@@ -19,7 +19,7 @@ templates = APIRouter(prefix="/v1/community/templates", tags=["Message Template"
 templates.limiter = limiter
 
 @templates.get("/")
-@limiter.limit("5/second")
+@limiter.limit("10/second")
 async def get_all_template(request: Request, response: Response, db: any = Depends(get_database)):
     return await fetch_all_templates(db)
 

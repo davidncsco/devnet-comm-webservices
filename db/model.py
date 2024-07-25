@@ -7,11 +7,12 @@ class Webhook(BaseModel):
     roomId: str
     name: str
     template: int | None = 1
-    
-class WebhookPayload(BaseModel):
+
+class CommonRoom_WebhookPayload(BaseModel):
     payload: dict
     id: str
     source: dict
+    
 
 class WebexMessageTemplate(BaseModel):
     id: int
