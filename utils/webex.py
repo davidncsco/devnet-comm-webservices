@@ -146,6 +146,25 @@ def refresh_webex_token(session: SessionManager):
 
     return results["access_token"]
 
+def get_webex_room_title(room_id: str) -> str:
+    """
+    Get the title of a Webex room using its ID.
+    """
+    if not room_id:
+        return None
+    session = SessionManager()
+    access_token = session.get("access_token")
+    url = f"https://webexapis.com/v1/rooms/{room_id}"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json",
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        room_details = json.loads(response.text)
+        return room_details.get("title")
+    return None
+    
 def get_webex_message_details(session: SessionManager, message_id: str) -> dict:
     access_token = session.get("access_token")
     url = f"https://webexapis.com/v1/messages/{message_id}"
@@ -235,7 +254,7 @@ def process_member_activity(email: str, message: dict):
             },
             "activityTitle" : {
                 "type": "text",
-                "value": "Webex new message"
+                "value": f"New Webex message from {get_webex_room_title(message.get('roomId'))} room"
             },
             "content": {
                 "type": content_type,
@@ -243,6 +262,7 @@ def process_member_activity(email: str, message: dict):
             },
             "timestamp": message.get('created'),
         }
+        #print(f"Activity details: {activity_details}")
         Member.add_member_activity(DESTINATION_SOURCE_ID,activity_details)
 
 async def process_webex_new_message(session: SessionManager, data: dict):
@@ -255,5 +275,8 @@ async def process_webex_new_message(session: SessionManager, data: dict):
     print(f"Received message from {email}")
     message = get_webex_message_details(session, data.get('id'))
     if message:
+        #print(f"Message details: {message}")
         process_member_activity(email, message)
-    #print(f"Message details: {message}")
+
+
+
