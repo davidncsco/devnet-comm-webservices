@@ -128,7 +128,25 @@ class Member:
             print(f"{devnet_account_tag} tag added to member with email={email}")
         else:
             print(f"Error adding member tag: {response.status_code} - {response.text}")
-
+            
+    @staticmethod
+    def add_member_activity(destinationSourceId: int, body: dict):
+        """
+        Adds an activity to a CR Community Member
+        """
+        print("func add_member_activity")
+        print(f"destinationSourceId={destinationSourceId}, body={body}")
+        url = f"https://api.commonroom.io/community/v1/source/{destinationSourceId}/activity"
+        headers = {
+            "Authorization": f"Bearer {common_room_bearer_token}",
+            "Content-Type": "application/json"
+        }
+        response = requests.post(url, headers=headers,json=body)
+        # Check for successful response
+        if response.status_code == 200 or response.status_code == 202:
+            print(f"Activity added to member with sourceId={destinationSourceId}")
+        else:
+            print(f"Error adding member activity: {response.status_code} - {response.text}")
 
 def devnet_upm_request(url) -> dict:
     """
@@ -180,6 +198,7 @@ async def log_message_to_room(user: Member, activityType: str):
         if template:
             send_message_to_room(webhook.roomId, {'email': user.email, 'provider_id': user.provider_id, 'activityType': activityType}, template)
 
+# Update this list if there are new social providers from Devnet UPM
 post_fixes = ["ciscosso", "facebook", "gplus", "commonidentity", "webex", "netacad"]
 
 def extract_email_prefix(accounts):

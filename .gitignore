@@ -163,6 +163,8 @@ t2.py
 payload.json
 sample.json
 abc.json
+devnet_profile.json
+team_membership.txt
 .vscode/
 saved/
 st-webhook-gen/
